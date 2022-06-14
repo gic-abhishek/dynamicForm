@@ -10,6 +10,7 @@ import { SecondFlowChartComponent } from './second-flow-chart/second-flow-chart.
 import * as PowerCharts from 'fusioncharts/fusioncharts.powercharts';
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 FusionChartsModule.fcRoot(FusionCharts, charts, FusionTheme,PowerCharts);
 @NgModule({
@@ -22,7 +23,8 @@ FusionChartsModule.fcRoot(FusionCharts, charts, FusionTheme,PowerCharts);
     BrowserModule,
     AppRoutingModule,
     FusionChartsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

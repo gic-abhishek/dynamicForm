@@ -1,1 +1,33 @@
 
+
+    <button type="button">Submit Form</button>
+
+    <div>
+      <form [formGroup]="form">
+          
+          <div *ngFor="let control of controls|keyvalue ">
+             <!-- <button (click)="getControls(control)">Click</button> -->
+             <label for="">{{control.key}}</label>
+            
+
+             <div *ngIf="getControls(control.value,control.key)=== 'string'">
+                 <input type="text" formControlName="{{ control.key }}">
+             </div>
+
+             <div *ngIf="getControls(control.value,control.key)=== 'array'">
+                 {{getControls(control.value,control.key)}}
+                 <div formArrayName="{{ control.key }}" >
+                    <ng-container *ngFor="let itemControl of getAllControls(control.key); let i = index;">
+
+
+                    </ng-container>
+
+                    {{ control }}
+
+                 </div>
+             </div>
+          </div>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+    {{ form.value | json}}

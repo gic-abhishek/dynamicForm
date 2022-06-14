@@ -8,132 +8,169 @@ import { from } from 'rxjs';
   styleUrls: ['./dynamic-form.component.css']
 })
 export class DynamicFormComponent implements OnInit {
-
+  controls:any
   form: FormGroup = new FormGroup({
 
   })
+  showForm: boolean=false;
 
-  constructor( private fb:FormBuilder) { }
+  constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.readData(this.data)
+   
+  }
+
+  obj = []
+  getFromControls(){
+    return (this.form.get('Expected Data') as FormArray).controls;
+  }
+  readData(data: any) {
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      let objArry = Object.keys(data)
+      objArry.forEach((key) => {
+        if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+          this.newFromGroupObject(key, data[key])
+          // this.form.addControl(key,new FormArray([]))
+        }
+        else if (Array.isArray(data[key])) {
+          this.form.addControl(key, this.fb.array([]))
+          this.newFormArray(key, data[key])
+        }
+
+        else  {
+          this.form.addControl(key, new FormControl(data[key]))
+        }
+      });
+    }
     console.log(this.form)
     console.log(this.form.value)
+    console.log(this.form.controls)
+    this.controls = this.form.controls
+
+    this.showForm=true;
+  }
+  getAllControls(controlName:any) {
+    
+    // console.log()
+    return (this.form.get(controlName) as FormArray);
+  }
+  getNextXontrols(controlName:any,index:any){
+
+    console.log(controlName)
+    return (this.form.get(controlName) as FormArray).controls;
+  }
+  getControls(control:any,key:any){
+ console.log(this.form.controls[key].value)
+
+ if (typeof this.form.controls[key].value === 'object' && !Array.isArray(this.form.controls[key].value)) {
+   console.log('object')
+  return 'object'
+ }
+ else if(Array.isArray(this.form.controls[key].value)){
+  console.log('array')
+  return 'array'
+ }
+ else{
+  console.log('string')
+  return 'string'
+ }
+// console.log("HTML value : ",control[key])
+// console.log("HTML key : ",key)
+
+
   }
 
-obj=[]
+  newFromGroupObject(keyName: any, keyData: any) {
+    let objArryCheck:any = Object.keys(keyData)
+    this.form.addControl(keyName,new FormGroup({}))
+    objArryCheck.forEach((item:any, index:any) => {
+    
+      if (typeof keyData[item] === 'object' && !Array.isArray(keyData[item])) {
+        this.newFromGroupObject(item, keyData[item])
+        // this.form.addControl(key,new FormArray([]))
+      }
+      else if (Array.isArray(keyData[item])) {
+        this.form.addControl(item, this.fb.array([]))
+        this.newFormArray(item, keyData[item])
+      }
 
-  readData(data:any){
-
-     if(typeof data === 'object' && !Array.isArray(data) ){ 
-       let objArry=Object.keys(data)
-
-      objArry.forEach((key)=> {
-       
-        const obj ={keyName:key,keyValue:data[key]}
-        if(typeof data[key] === 'object' && !Array.isArray(data)){
-          this.form.addControl(key,new FormArray([]))
-        }
-       if(Array.isArray(data[key])){
-        console.log('arrry check')
-        this.form.addControl(key,this.fb.array([]))
-        this.newFormArrat(key,data[key])
-       
+      else {
+        let accessFromGroup= <FormGroup>this.form.controls[keyName]
+        accessFromGroup.addControl(item,new FormControl(keyData[item]))
        }
     });
-     }
+
   }
 
-  newFormArrat(keyName:any,keyData:any){
-    keyData.forEach((el:any,index:any)=>{
-      if(typeof el === 'object' && !Array.isArray(el) ){ 
-        let objArry=Object.keys(el)
-        let newFormArryNew=<FormArray>this.form.controls[keyName]
+  newFormArray(keyName: any, keyData: any) {
+    keyData.forEach((el: any, index: any) => {
+      if (typeof el === 'object' && !Array.isArray(el)) {
+     
+        let objArry = Object.keys(el)
+        let newFormArryNew = <FormArray>this.form.controls[keyName]
         newFormArryNew.push(this.fb.group({}));
-        objArry.forEach((x)=> {
-          if(typeof el[x] === 'object' && !Array.isArray(el[x])){
-            let newGroup= newFormArryNew.controls[index] as FormGroup;
-            newGroup.addControl(x,new FormControl(el[x]))
+        objArry.forEach((x) => {
+          if (typeof el[x] === 'object' && !Array.isArray(el[x])) {
+            let newGroup = newFormArryNew.controls[index] as FormGroup;
+            newGroup.addControl(x, new FormControl(el[x]))
           }
-         else if(Array.isArray(el[x])){
-        let NewDataArray=newFormArryNew.controls[index] as FormGroup 
-        NewDataArray.addControl(x,new FormArray([]))
-        console.log(el[x])
-          el[x].forEach((y:any,indexNew:any)=> {
-             if(typeof y === 'object' && !Array.isArray(y)){
-              let objArryNew=Object.keys(y)
-              // console.log(y)
-              objArryNew.forEach((objData:any,indexValue:any)=> {
-                
-                let newFormArryNew2=NewDataArray.controls[x] as FormArray
-              
-              newFormArryNew2.push(new FormControl())
-            // console.log(newDataNew1)
-            
-                // newDataNew1.addControl(objData,new FormControl(y[objData]))
-                // let temp=newFormArryNew1.controls[x] as FormGroup  
-                // console.log(temp)
+          else if (Array.isArray(el[x])) {
+            let NewDataArray = newFormArryNew.controls[index] as FormGroup
+            NewDataArray.addControl(x, new FormArray([]))
+            el[x].forEach((y: any, indexNew: any) => {
 
-                // temp.addControl(objData,new FormControl(y[objData]));
-              })
-            // let newFormArryNew1=newFormArryNew.controls[index] as FormGroup  
-            // let temp=<FormArray>newFormArryNew1.controls[x]
-            // temp.push(new FormControl(y));
-          }else if(Array.isArray(y)){
-            console.log(y)
-            // let newFormArryNew1=newFormArryNew.controls[index] as FormGroup  
-            // let temp=<FormArray>newFormArryNew1.controls[x]
-            // temp.push(new FormControl(y));
-          }else if(typeof y === 'string'){
-          
-            let newFormArryNew1=newFormArryNew.controls[index] as FormGroup  
-           let temp=<FormArray>newFormArryNew1.controls[x]
-           temp.push(new FormControl(y));
+              if (typeof y === 'object' && !Array.isArray(y)) {
+                let objArryNew = Object.keys(y)
+                let newFormArryNew2 = NewDataArray.controls[x] as FormArray
+                newFormArryNew2.push(this.fb.group({}))
+                let newFromGroup = newFormArryNew2.controls[indexNew] as FormGroup
+                objArryNew.forEach((objData: any, indexValue: any) => {
+
+                  newFromGroup.addControl(objData, new FormControl(y[objData]))
+
+                })
+
+              } else if (Array.isArray(y)) {
+
+              } else if (typeof y === 'string') {
+                // console.log(y)
+                let newFormArryNew1 = newFormArryNew.controls[index] as FormGroup
+                let temp = <FormArray>newFormArryNew1.controls[x]
+                temp.push(new FormControl(y));
+              }
+            })
           }
-          })        
-         }
-         else{
-          let newGroup= newFormArryNew.controls[index] as FormGroup;
-            newGroup.addControl(x,new FormControl(el[x]))
-         }
-       
-      
+          else {
+            let newGroup = newFormArryNew.controls[index] as FormGroup;
+            newGroup.addControl(x, new FormControl(el[x]))
+          }
         })
       }
-      
-       
+      else if(Array.isArray(el)){
+this.newFormArray(keyName, el)
+      }
+      else{
+       let accessFromGroup = <FormArray>this.form.controls[keyName]
+       accessFromGroup.push(new FormControl(el));
+      }
     })
-
   }
 
-  data={
+  formDataSubmit(){
+    console.log(this.form)
+  }
+
+  data =  {
+    "newData":'jiji',
     "CompDocMatch": [
-      {
-        "ComponentName": "Pan card Verification",
-        "DocumentSection": "Pan Card (As per Document)"
-      },
-      {
-        "ComponentName": "Driving license",
-        "DocumentSection": "Driving License (As per Document)"
-      },
-      {
-        "ComponentName": "Passport Investigation",
-        "DocumentSection": "Passport (As per Document)"
-      },
-      {
-        "ComponentName": "Document Investigation",
-        "DocumentSection": "Voter ID (As per Document)"
-      },
-      {
-        "ComponentName": "Document Investigation",
-        "DocumentSection": "Aadhaar Card (As per Document)"
-      }
+     ['hello','rahul']
     ],
     "Document List": [
       {
         "Field": "5",
         "Value": [
-          "Pan Card (As per Document)","hello"
+          "Pan Card (As per Document)"
         ]
       },
       {
@@ -165,19 +202,19 @@ obj=[]
       {
         "Field": "Execution SubComponent",
         "Value": [
-          "Voters ID"
+          "Pan Card Verification"
         ]
       },
       {
         "Field": "CountOfDocumenttoInclude",
         "Value": [
-          "1"
+          "2"
         ]
       },
       {
         "Field": "Do we Need to Check Prefrences",
         "Value": [
-          "Yes"
+          "No"
         ]
       },
       {
