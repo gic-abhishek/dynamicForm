@@ -53,7 +53,7 @@ export class DynamicFormComponent implements OnInit {
   getAllControls(controlName:any) {
     
     // console.log()
-    return (this.form.get(controlName) as FormArray);
+    return (this.form.get(controlName) as FormArray).controls;
   }
   getNextXontrols(controlName:any,index:any){
 
