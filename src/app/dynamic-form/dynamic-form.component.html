@@ -5,7 +5,7 @@
     <div>
       <form [formGroup]="form">
           
-          <div *ngFor="let control of controls|keyvalue ">
+          <div *ngFor="let control of controls | keyvalue ">
              <!-- <button (click)="getControls(control)">Click</button> -->
              <label for="">{{control.key}}</label>
             
